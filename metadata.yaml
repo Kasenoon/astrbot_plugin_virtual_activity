@@ -17,7 +17,7 @@ desc: |
   - **安静模式**：自动活动默认不发消息，只更新状态；想听它说话再打开 `announce_activity`。
 
   零额外依赖：纯 Python 标准库，不需要 pip 装包、不需要 Node。
-author: "dsh"
+author: "Kasenoon"
 version: "0.6.1"
 repo: "https://github.com/Kasenoon/astrbot_plugin_virtual_activity"
 astrbot_version: ">=4.20.0"
