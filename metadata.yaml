@@ -19,7 +19,7 @@ desc: |
   零额外依赖：纯 Python 标准库，不需要 pip 装包、不需要 Node。
 author: "dsh"
 version: "0.6.1"
-repo: "https://github.com/your-name/astrbot_plugin_virtual_activity"
+repo: "https://github.com/Kasenoon/astrbot_plugin_virtual_activity"
 astrbot_version: ">=4.20.0"
 support_platforms:
   - aiocqhttp
