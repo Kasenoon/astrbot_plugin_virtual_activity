@@ -1,0 +1,341 @@
+{
+  "enable_auto_tick": {
+    "description": "开启自动活动",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后只有手动点击 / 指令会触发活动"
+  },
+  "tick_min_minutes": {
+    "description": "随机间隔下限（分钟）",
+    "type": "int",
+    "default": 20,
+    "slider": { "min": 1, "max": 720, "step": 1 }
+  },
+  "tick_max_minutes": {
+    "description": "随机间隔上限（分钟）",
+    "type": "int",
+    "default": 45,
+    "slider": { "min": 1, "max": 720, "step": 1 },
+    "hint": "每次活动结束后，在这个区间里随机挑下一次触发时间"
+  },
+  "active_hours": {
+    "description": "允许活动的时间段",
+    "type": "string",
+    "default": "08:00-20:00",
+    "hint": "格式 HH:MM-HH:MM，多个用逗号分隔，例如 08:00-12:00,14:00-20:00"
+  },
+  "quiet_hours": {
+    "description": "静默时段",
+    "type": "string",
+    "default": "23:00-08:00",
+    "hint": "这段时间绝不主动触发，支持跨天"
+  },
+  "admin_qq": {
+    "description": "管理员 QQ",
+    "type": "string",
+    "default": "",
+    "hint": "填你自己的 QQ；活动消息发到这个号的私聊，指令也只认这个号。留空则只认 AstrBot 全局管理员"
+  },
+  "admin_umo": {
+    "description": "发送目标会话（可留空）",
+    "type": "string",
+    "default": "",
+    "hint": "留空会自动用管理员最近一次私聊的会话；格式 平台ID:FriendMessage:QQ"
+  },
+  "platform_id": {
+    "description": "平台 ID",
+    "type": "string",
+    "default": "",
+    "hint": "留空自动选第一个已连接平台"
+  },
+  "multi_effect_policy": {
+    "description": "多效果选择策略",
+    "type": "string",
+    "default": "llm",
+    "options": ["llm", "random", "first"],
+    "labels": ["交给 LLM 选（推荐）", "按权重随机", "总是第一条"]
+  },
+  "llm_provider_id": {
+    "description": "文案模型",
+    "type": "string",
+    "default": "",
+    "_special": "select_provider",
+    "hint": "留空使用默认对话模型"
+  },
+  "llm_timeout_sec": {
+    "description": "生成文案超时（秒）",
+    "type": "int",
+    "default": 20,
+    "slider": { "min": 5, "max": 120, "step": 1 }
+  },
+  "default_duration_sec": {
+    "description": "默认活动时长（秒）",
+    "type": "int",
+    "default": 600,
+    "hint": "单个效果没有填写时长时使用；活动期间不会再触发"
+  },
+  "recent_limit": {
+    "description": "历史记录保留条数",
+    "type": "int",
+    "default": 20,
+    "slider": { "min": 5, "max": 100, "step": 1 }
+  },
+  "inject_prompt": {
+    "description": "把房间状态注入对话",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后，机器人正常聊天时知道自己正在哪、在做什么；关闭后它只会给你推送消息，聊起天来却不知道这些"
+  },
+  "inject_scope": {
+    "description": "注入范围",
+    "type": "string",
+    "default": "all",
+    "options": ["all", "admin"],
+    "labels": ["所有会话", "仅管理员"],
+    "hint": "房间是机器人自己的，通常所有会话都可以知道；嫌占 token 可以只对管理员注入"
+  },
+  "energy_recover_per_min": {
+    "description": "精力自然恢复（每分钟）",
+    "type": "float",
+    "default": 0.5,
+    "slider": { "min": 0, "max": 5, "step": 0.1 },
+    "hint": "躺着不动时精力每分钟回多少；各个活动自己填 energy_delta 决定消耗或恢复"
+  },
+  "social_grow_min": {
+    "description": "社交指数增长下限（每分钟）",
+    "type": "int",
+    "default": 1,
+    "slider": { "min": 0, "max": 10, "step": 1 }
+  },
+  "social_grow_max": {
+    "description": "社交指数增长上限（每分钟）",
+    "type": "int",
+    "default": 2,
+    "slider": { "min": 0, "max": 10, "step": 1 },
+    "hint": "每分钟随机 +1~+2，越攒越想找主人说话"
+  },
+  "social_talk_threshold": {
+    "description": "主动搭话阈值",
+    "type": "int",
+    "default": 70,
+    "slider": { "min": 30, "max": 100, "step": 5 },
+    "hint": "社交指数超过这个值后，tick 可能变成主动找你说话；越接近 100 概率越高"
+  },
+  "social_talk_cost": {
+    "description": "搭话后社交指数回落",
+    "type": "int",
+    "default": 45,
+    "slider": { "min": 5, "max": 90, "step": 5 },
+    "hint": "主动说完话后社交指数下降多少"
+  },
+  "tv_hours_weekday": {
+    "description": "电视谷时（工作日）",
+    "type": "string",
+    "default": "12:00-14:00,18:00-22:00",
+    "hint": "格式 HH:MM-HH:MM，多段用逗号分隔；不在这段时间里电视不可选"
+  },
+  "tv_hours_weekend": {
+    "description": "电视谷时（周末）",
+    "type": "string",
+    "default": "00:00-24:00",
+    "hint": "00:00-24:00 表示全天"
+  },
+  "tv_daily_limit": {
+    "description": "每天最多看几个视频",
+    "type": "int",
+    "default": 3,
+    "slider": { "min": 0, "max": 20, "step": 1 },
+    "hint": "0 表示当天不能看电视"
+  },
+  "tv_videos_per_session": {
+    "description": "一次看几个视频",
+    "type": "int",
+    "default": 2,
+    "slider": { "min": 1, "max": 5, "step": 1 }
+  },
+  "tv_partitions": {
+    "description": "额外分区（没有偏好清单时才用）",
+    "type": "string",
+    "default": "",
+    "hint": "支持分区名或数字 rid，逗号分隔：动画 番剧 游戏 单机游戏 知识 科技 鬼畜 娱乐 影视 音乐 生活 美食 舞蹈 时尚 纪录片；留空用综合热门。填了偏好清单后这一项会被忽略"
+  },
+  "tv_prefer_lines": {
+    "description": "多推的偏好",
+    "type": "text",
+    "default": "游戏实况 | 游戏,单机游戏 | 实况,通关,攻略,速通\n剧情解析 | 影视,游戏 | 剧情,解析,解说,结局,伏笔\n读书书评 | 知识 | 读书,书评,书籍,书单,读后感\n美食 | 美食 | 美食,做饭,探店,吃播\n动画 | 动画,番剧 | 番剧,动画,新番",
+    "hint": "每行一条：名称 | 分区 | 关键词。命中这些的权重更高（2 倍），会被优先挑中"
+  },
+  "tv_ok_lines": {
+    "description": "可以看看的偏好",
+    "type": "text",
+    "default": "抽象整活 | 生活,鬼畜 | 整活,抽象,沙雕,整蛊\n搞笑鬼畜 | 鬼畜 | 搞笑,鬼畜,名场面\n科普 | 知识,科技 | 科普,原理,冷知识\n音乐翻唱 | 音乐 | 翻唱,cover,弹唱",
+    "hint": "格式同上，权重 1 倍"
+  },
+  "tv_duration_min_minutes": {
+    "description": "视频时长下限（分钟）",
+    "type": "int",
+    "default": 3,
+    "slider": { "min": 0, "max": 60, "step": 1 },
+    "hint": "0 表示不限；太短的不看"
+  },
+  "tv_duration_max_minutes": {
+    "description": "视频时长上限（分钟）",
+    "type": "int",
+    "default": 8,
+    "slider": { "min": 1, "max": 120, "step": 1 },
+    "hint": "超过这个长度的不挑；如果整个分区都没有合适的，会退而取最接近的"
+  },
+  "tv_min_views": {
+    "description": "最低播放量",
+    "type": "int",
+    "default": 1000,
+    "slider": { "min": 0, "max": 100000, "step": 500 },
+    "hint": "用来挡掉分区最新里的垃圾投稿；0 表示不过滤"
+  },
+  "tv_keywords": {
+    "description": "偏好关键词",
+    "type": "list",
+    "default": [],
+    "hint": "标题里包含任意一个关键词才算命中，例如 猫、恐怖游戏、coding；留空表示不按关键词过滤"
+  },
+  "tv_weight_boost": {
+    "description": "谷时电视权重加成",
+    "type": "float",
+    "default": 2.5,
+    "slider": { "min": 1, "max": 6, "step": 0.5 },
+    "hint": "谷时挑家具时电视的权重倍率，比别的活动更容易被选中"
+  },
+  "tv_cookie": {
+    "description": "B 站 SESSDATA（可选）",
+    "type": "string",
+    "default": "",
+    "secret": true,
+    "hint": "留空用匿名接口；填裸 SESSDATA 或整段 cookie 可降低被风控的概率"
+  },
+  "tv_timeout_sec": {
+    "description": "B 站请求超时（秒）",
+    "type": "int",
+    "default": 10,
+    "slider": { "min": 3, "max": 60, "step": 1 }
+  },
+  "robot_avatar": {
+    "description": "机器人图标",
+    "type": "string",
+    "default": "🐋",
+    "hint": "显示在房间视图里表示它现在的位置：填一个表情（🐋）或图片 URL / 路径（https://…logo.png）"
+  },
+  "inject_mode": {
+    "description": "状态注入方式",
+    "type": "string",
+    "default": "smart",
+    "options": ["smart", "always"],
+    "labels": ["按需注入（省 token）", "每次都注入"],
+    "hint": "smart 模式下，只有聊到「在干嘛/在哪/天气/电视/房间」这类话题时才把状态塞进上下文"
+  },
+  "inject_keywords": {
+    "description": "额外的触发词",
+    "type": "list",
+    "default": [],
+    "hint": "smart 模式下，消息里出现这些词也会注入状态；只收录 2 字以上的词，单字（吃/热/床）太容易误命中"
+  },
+  "read_excerpt_in_prompt": {
+    "description": "注入时带上书里摘录",
+    "type": "bool",
+    "default": true,
+    "hint": "关掉后只报《书名》和进度，不带正文摘录，最不容易串味"
+  },
+  "record_proactive_history": {
+    "description": "主动消息写入对话历史",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后，主动发的消息会记进会话，你回复时它知道自己刚说过什么"
+  },
+  "announce_activity": {
+    "description": "自动活动是否发消息",
+    "type": "bool",
+    "default": false,
+    "hint": "关闭后自动 tick 只更新状态、不发消息（也就是不“报备”）；手动 /点 和 /测试点 仍会回一句话"
+  },
+  "read_chars": {
+    "description": "每次读多少字",
+    "type": "int",
+    "default": 1500,
+    "slider": { "min": 200, "max": 5000, "step": 100 },
+    "hint": "日式轻小说一次 1200~2000 字比较像“读了一小节”；500 字太短，一本 40 万字的书要读 800 次"
+  },
+  "read_loop": {
+    "description": "读完了从头再来",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后一本书读完就停住，需要你手动换书或重置进度"
+  },
+  "read_weight_boost": {
+    "description": "读书权重加成",
+    "type": "float",
+    "default": 1.6,
+    "slider": { "min": 1, "max": 6, "step": 0.1 },
+    "hint": "让「看书」更容易被抽到：1.6 约等于每天 2.3 次，调到 3 约 4.7 次；1 表示不加成"
+  },
+  "book_lookup_limit": {
+    "description": "查书时最多返回几段",
+    "type": "int",
+    "default": 2,
+    "slider": { "min": 1, "max": 5, "step": 1 }
+  },
+  "book_lookup_chars": {
+    "description": "每段摘录多少字",
+    "type": "int",
+    "default": 240,
+    "slider": { "min": 80, "max": 600, "step": 20 },
+    "hint": "只在「已读部分」里搜，所以不会剧透"
+  },
+  "weather_enabled": {
+    "description": "启用天气",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后不请求天气，也不注入"
+  },
+  "weather_key": {
+    "description": "和风天气 API Key",
+    "type": "string",
+    "default": "",
+    "secret": true,
+    "hint": "dev.qweather.com 控制台里的凭据；留空则完全不请求天气"
+  },
+  "weather_api_host": {
+    "description": "和风天气 API Host",
+    "type": "string",
+    "default": "devapi.qweather.com",
+    "hint": "新控制台每个项目有专属 Host，形如 xxxx.re.qweatherapi.com；老账号可以用 devapi.qweather.com"
+  },
+  "weather_city": {
+    "description": "城市名（只用于显示）",
+    "type": "string",
+    "default": "重庆"
+  },
+  "weather_location_id": {
+    "description": "城市 LocationID",
+    "type": "string",
+    "default": "101040100",
+    "hint": "重庆 101040100；渝中 101040200、江北 101040300，区县可以自己换"
+  },
+  "weather_cache_minutes": {
+    "description": "天气缓存（分钟）",
+    "type": "int",
+    "default": 30,
+    "slider": { "min": 5, "max": 180, "step": 5 },
+    "hint": "和风免费额度按月计算，30 分钟一次完全够用"
+  },
+  "weather_inject": {
+    "description": "把天气写进机器人状态",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后聊天时它会说得出窗外天气，选家具也会受天气影响"
+  },
+  "weather_timeout_sec": {
+    "description": "天气请求超时（秒）",
+    "type": "int",
+    "default": 8,
+    "slider": { "min": 3, "max": 30, "step": 1 }
+  }
+}

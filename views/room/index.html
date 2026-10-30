@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>房间 · 虚拟活动</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">🏠</div>
+        <div class="brand-text">
+          <h1 id="room-name">虚拟活动</h1>
+          <p id="room-sub">加载中…</p>
+        </div>
+      </div>
+
+      <div class="chips">
+        <span class="chip" id="chip-now">—</span>
+        <span class="chip" id="chip-next">—</span>
+        <span class="chip" id="chip-body">—</span>
+      </div>
+
+      <div class="actions">
+        <div class="switch" role="tablist" aria-label="模式">
+          <button class="switch-btn is-active" data-mode="interact" id="mode-interact" type="button">互动</button>
+          <button class="switch-btn" data-mode="edit" id="mode-edit" type="button">编辑</button>
+        </div>
+        <button class="btn" id="btn-tick" type="button">立刻来一次</button>
+        <button class="btn btn-primary" id="btn-save" type="button">保存布局</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage-wrap" id="stage-wrap">
+        <div class="stage" id="stage"></div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <h2 id="panel-title">房间</h2>
+          <button class="btn btn-small" id="btn-add" type="button">＋ 家具</button>
+        </div>
+        <div class="panel-body" id="panel-body"></div>
+      </aside>
+    </main>
+
+    <footer class="feed">
+      <div class="feed-head">
+        <span>活动记录</span>
+        <span class="feed-hint" id="feed-hint"></span>
+      </div>
+      <ul class="feed-list" id="feed-list"></ul>
+    </footer>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
