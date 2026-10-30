@@ -413,6 +413,41 @@ class EngineTestCase(unittest.IsolatedAsyncioTestCase):
         self.assertGreaterEqual(social, 10 + 30)
         self.assertLessEqual(social, 10 + 60)
 
+    async def test_social_grows_with_fractional_rate(self):
+        # 每分钟只涨 0.2~0.2，30 分钟应该正好 +6.0（而不是被取整成 0 或 1）
+        self.cfg["social_grow_min"] = 0.2
+        self.cfg["social_grow_max"] = 0.2
+        state = self.store.load_state("default")
+        state["social_hunger"] = 10.0
+        state["updated_at"] = store_module.isoformat(self.clock.moment - timedelta(minutes=30))
+        self.store._atomic_write(self.store.state_path("default"), state)
+
+        engine = self.make_engine()
+        result = await engine.run_activity("default", "sofa", source="click", effect_id="sofa_rest", bypass=True)
+        social = float(result.state["social_hunger"])
+        self.assertAlmostEqual(social, 16.0, places=1)
+
+    async def test_social_threshold_accepts_fraction(self):
+        self.cfg["social_talk_threshold"] = 45.5
+        engine = self.make_engine()
+        below = {"energy": 80, "social_hunger": 45.4}
+        self.assertFalse(engine._should_socialize(below))
+        engine.rng.seed(1)
+        above = {"energy": 80, "social_hunger": 45.6}
+        # 45.6 已过阈值，概率为 (0.456)^2 ≈ 0.21，多试几次一定能触发
+        self.assertTrue(any(engine._should_socialize(above) for _ in range(60)))
+
+    async def test_social_talk_cost_accepts_fraction(self):
+        self.cfg["social_talk_cost"] = 10.5
+        self.responses = ['{"text": "在忙吗？"}']
+        engine = self.make_engine()
+        state = self.store.load_state("default")
+        state["social_hunger"] = 80.0
+        self.store._atomic_write(self.store.state_path("default"), state)
+        result = await engine.run_social("default", source="test", bypass=True)
+        self.assertTrue(result.ok, result.message)
+        self.assertAlmostEqual(float(result.state["social_hunger"]), 69.5, places=1)
+
     async def test_high_social_triggers_talking(self):
         state = self.store.load_state("default")
         state["social_hunger"] = 100.0

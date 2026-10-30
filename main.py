@@ -32,6 +32,16 @@ from .core.weather import WeatherService
 PLUGIN_NAME = "astrbot_plugin_virtual_activity"
 ROBOT_ID = "default"
 
+
+def _fmt_num(value: Any) -> str:
+    """整数就显示整数，带小数就保留一位（社交指数支持小数）。"""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "?"
+    return f"{number:.0f}" if number.is_integer() else f"{number:.1f}"
+
+
 HELP_TEXT = (
     "虚拟活动\n"
     "· /回家  看看现在在干嘛\n"
@@ -465,7 +475,7 @@ class VirtualActivityPlugin(Star):
             lines = [
                 "测试活动：主动找主人说话",
                 f"文案：{result.text}",
-                f"社交指数 → {state.get('social_hunger')}",
+                f"社交指数 → {_fmt_num(state.get('social_hunger'))}",
                 f"精力 {state.get('energy')}",
                 f"下次 tick：{result.next_tick_at or '未排'}",
             ]
@@ -481,7 +491,7 @@ class VirtualActivityPlugin(Star):
             f"文案：{result.text}",
             f"时长：{eff.get('duration_sec')} 秒",
             f"位置：{state.get('location')}",
-            f"精力 {state.get('energy')}（该效果 {eff.get('energy_delta')}）· 社交 {state.get('social_hunger')}",
+            f"精力 {_fmt_num(state.get('energy'))}（该效果 {eff.get('energy_delta')}）· 社交 {_fmt_num(state.get('social_hunger'))}",
             f"下次 tick：{result.next_tick_at or '未排'}",
         ]
         if result.bypassed:
@@ -610,7 +620,7 @@ class VirtualActivityPlugin(Star):
 
         windows = status.get("windows") or {}
         lines.append(f"活动时段 {windows.get('active')} · 静默 {windows.get('quiet')}")
-        body = f"精力 {state.get('energy')} · 社交 {state.get('social_hunger')}"
+        body = f"精力 {_fmt_num(state.get('energy'))} · 社交 {_fmt_num(state.get('social_hunger'))}"
         try:
             if float(state.get("energy")) < 30:
                 body += "（有点累）"

@@ -65,6 +65,12 @@ function fmtNumber(value, fallback = "—") {
   return Number.isFinite(number) ? `${Math.round(number)}` : fallback;
 }
 
+function fmtDecimal(value, fallback = "—") {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Number.isInteger(number) ? `${number}` : number.toFixed(1);
+}
+
 function clamp(value, low, high) {
   return Math.max(low, Math.min(high, value));
 }
@@ -190,7 +196,7 @@ function updateChips() {
   }
 
   const body = (status.state && status.state) || {};
-  els.chipBody.textContent = `精力 ${fmtNumber(body.energy)} · 社交 ${fmtNumber(body.social_hunger)}`;
+  els.chipBody.textContent = `精力 ${fmtNumber(body.energy)} · 社交 ${fmtDecimal(body.social_hunger)}`;
 }
 
 async function refreshStatus() {

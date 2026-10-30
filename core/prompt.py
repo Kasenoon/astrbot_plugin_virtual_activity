@@ -81,11 +81,14 @@ def should_inject(text: str, extra_keywords: list[str] | None = None) -> bool:
     return False
 
 
-def _fmt_number(value: Any) -> str:
+def _fmt_number(value: Any, digits: int = 0) -> str:
     try:
-        return f"{float(value):.0f}"
+        text = f"{float(value):.{digits}f}"
     except (TypeError, ValueError):
         return "?"
+    if digits > 0:
+        text = text.rstrip("0").rstrip(".")
+    return text
 
 
 def build_state_block(
@@ -101,7 +104,7 @@ def build_state_block(
     recent: list[str] | None = None,
     last_text: str | None = None,
     last_text_at: str | None = None,
-    social_threshold: int = 70,
+    social_threshold: float = 70.0,
     weather: str | None = None,
     reading: str | None = None,
 ) -> str:
@@ -128,7 +131,7 @@ def build_state_block(
         lines.append(f"- 在读：{reading}")
 
     if energy is not None or social is not None:
-        lines.append(f"- 身体：精力 {_fmt_number(energy)}/100，想社交 {_fmt_number(social)}/100")
+        lines.append(f"- 身体：精力 {_fmt_number(energy)}/100，想社交 {_fmt_number(social, 1)}/100")
 
     try:
         social_value = float(social)

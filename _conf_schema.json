@@ -103,30 +103,31 @@
   },
   "social_grow_min": {
     "description": "社交指数增长下限（每分钟）",
-    "type": "int",
-    "default": 1,
-    "slider": { "min": 0, "max": 10, "step": 1 }
+    "type": "float",
+    "default": 1.0,
+    "slider": { "min": 0, "max": 10, "step": 0.1 },
+    "hint": "支持小数，比如 0.2 表示一分钟只涨一点点"
   },
   "social_grow_max": {
     "description": "社交指数增长上限（每分钟）",
-    "type": "int",
-    "default": 2,
-    "slider": { "min": 0, "max": 10, "step": 1 },
-    "hint": "每分钟随机 +1~+2，越攒越想找主人说话"
+    "type": "float",
+    "default": 2.0,
+    "slider": { "min": 0, "max": 10, "step": 0.1 },
+    "hint": "每分钟在这个区间里随机涨；想让它慢慢攒，可以设成 0.3~0.8"
   },
   "social_talk_threshold": {
     "description": "主动搭话阈值",
-    "type": "int",
-    "default": 70,
-    "slider": { "min": 30, "max": 100, "step": 5 },
+    "type": "float",
+    "default": 70.0,
+    "slider": { "min": 30, "max": 100, "step": 1 },
     "hint": "社交指数超过这个值后，tick 可能变成主动找你说话；越接近 100 概率越高"
   },
   "social_talk_cost": {
     "description": "搭话后社交指数回落",
-    "type": "int",
-    "default": 45,
-    "slider": { "min": 5, "max": 90, "step": 5 },
-    "hint": "主动说完话后社交指数下降多少"
+    "type": "float",
+    "default": 45.0,
+    "slider": { "min": 5, "max": 90, "step": 1 },
+    "hint": "主动说完话后社交指数下降多少，支持小数"
   },
   "tv_hours_weekday": {
     "description": "电视谷时（工作日）",

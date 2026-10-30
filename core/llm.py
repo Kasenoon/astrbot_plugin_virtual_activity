@@ -70,7 +70,7 @@ def _energy_tag(effect: dict[str, Any]) -> str:
     return ""
 
 
-def _mood_hint(energy: Any, social: Any, social_threshold: int) -> str:
+def _mood_hint(energy: Any, social: Any, social_threshold: float) -> str:
     hints: list[str] = []
     try:
         energy_value = float(energy)
@@ -94,7 +94,7 @@ def _status_text(state: dict[str, Any]) -> str:
     social = state.get("social_hunger", 45)
     try:
         energy_text = f"{float(energy):.0f}"
-        social_text = f"{float(social):.0f}"
+        social_text = f"{float(social):.1f}".rstrip("0").rstrip(".")
     except (TypeError, ValueError):
         energy_text, social_text = "80", "45"
     return f"精力 {energy_text}/100，想社交 {social_text}/100"
@@ -108,7 +108,7 @@ def build_decision_prompt(
     effects: list[dict[str, Any]],
     state: dict[str, Any],
     clock_text: str,
-    social_threshold: int = 70,
+    social_threshold: float = 70.0,
     weather_text: str = "",
 ) -> str:
     furniture_name = furniture.get("name", "家具")
@@ -138,7 +138,7 @@ def build_phrase_prompt(
     effect: dict[str, Any],
     state: dict[str, Any],
     clock_text: str,
-    social_threshold: int = 70,
+    social_threshold: float = 70.0,
     weather_text: str = "",
 ) -> str:
     furniture_name = furniture.get("name", "家具")
@@ -171,7 +171,7 @@ def build_social_prompt(
     clock_text: str,
     state: dict[str, Any],
     behavior: dict[str, Any] | None = None,
-    social_threshold: int = 70,
+    social_threshold: float = 70.0,
 ) -> str:
     """社交指数高时，主动找主人搭话。"""
     doing = "闲着，在屋里待着"

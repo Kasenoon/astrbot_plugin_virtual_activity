@@ -137,6 +137,13 @@ class VirtualRoomEngine:
         except (TypeError, ValueError):
             return default
 
+    def _float_cfg(self, key: str, default: float) -> float:
+        """配置读成小数：社交增长、阈值、回落量都支持 0.5 这种值。"""
+        try:
+            return float(self._cfg(key, default))
+        except (TypeError, ValueError):
+            return default
+
     def announce_enabled(self) -> bool:
         """自动活动要不要发消息“报备”。"""
         value = self._cfg("announce_activity", False)
@@ -233,21 +240,12 @@ class VirtualRoomEngine:
         return state["next_tick_at"]
 
     def _social_growth(self, minutes: float) -> float:
-        """社交指数按分钟随机增长：每分钟 +1 或 +2（可配）。"""
-        low = max(0, self._int_cfg("social_grow_min", 1))
-        high = max(low, self._int_cfg("social_grow_max", 2))
+        """社交指数按分钟随机增长，支持小数配置（比如每分钟 +0.2~+0.5）。"""
+        low = max(0.0, self._float_cfg("social_grow_min", 1.0))
+        high = max(low, self._float_cfg("social_grow_max", 2.0))
         if minutes <= 0:
             return 0.0
-        whole = int(minutes)
-        fraction = minutes - whole
-        gain = 0.0
-        if whole > 0:
-            steps = min(whole, 24 * 60 * 7)
-            gain += sum(self.rng.randint(low, high) for _ in range(steps))
-            if whole > steps:
-                gain += (whole - steps) * ((low + high) / 2.0)
-        if fraction > 0:
-            gain += fraction * self.rng.uniform(low, high)
+        gain = self.rng.uniform(low, high) * min(minutes, 24 * 60 * 7)
         return gain
 
     def _apply_body_state(self, state: dict[str, Any], now: datetime, effect: dict[str, Any] | None = None) -> None:
@@ -323,7 +321,7 @@ class VirtualRoomEngine:
             effects=effects,
             state=state,
             clock_text=clock_text,
-            social_threshold=self._int_cfg("social_talk_threshold", 70),
+            social_threshold=self._float_cfg("social_talk_threshold", 70.0),
             weather_text=weather_text,
         )
         # 结构化输出不一定一次就对：第一次解析失败时补一句更硬的格式要求重试一次
@@ -353,7 +351,7 @@ class VirtualRoomEngine:
             effect=effect,
             state=state,
             clock_text=now.strftime("%H:%M"),
-            social_threshold=self._int_cfg("social_talk_threshold", 70),
+            social_threshold=self._float_cfg("social_talk_threshold", 70.0),
             weather_text=weather_text,
         )
         try:
@@ -836,7 +834,7 @@ class VirtualRoomEngine:
 
     def _should_socialize(self, state: dict[str, Any]) -> bool:
         """社交指数越高，越可能主动找主人说话。"""
-        threshold = self._int_cfg("social_talk_threshold", 70)
+        threshold = self._float_cfg("social_talk_threshold", 70.0)
         try:
             social = float(state.get("social_hunger", 0.0))
         except (TypeError, ValueError):
@@ -892,7 +890,7 @@ class VirtualRoomEngine:
                 text = self.rng.choice(["在忙吗？", "你干嘛呢？", "突然想跟你说句话。"])
 
             self._apply_body_state(state, now, effect=None)
-            cost = max(0, self._int_cfg("social_talk_cost", 45))
+            cost = max(0.0, self._float_cfg("social_talk_cost", 45.0))
             try:
                 social = float(state.get("social_hunger", 0.0))
             except (TypeError, ValueError):
@@ -945,7 +943,7 @@ class VirtualRoomEngine:
             clock_text=now.strftime("%H:%M"),
             state=state,
             behavior=behavior,
-            social_threshold=self._int_cfg("social_talk_threshold", 70),
+            social_threshold=self._float_cfg("social_talk_threshold", 70.0),
         )
         try:
             raw = await self._generate(llm.SYSTEM_PROMPT, prompt)
