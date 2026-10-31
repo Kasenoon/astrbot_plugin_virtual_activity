@@ -2,6 +2,13 @@
 
 版本号遵循语义化版本（`metadata.yaml` 里不带 `v` 前缀）。
 
+## 0.6.3
+
+- 新增：**管理员主动找它说话时，社交指数直接重置**（`social_reset_on_owner_message`，默认开）
+- 重置目标值可配 `social_reset_value`（默认 `0`，完全清零）
+- 原来只有「机器人主动搭话」才会回落，现在双向都算：你找它也满足它的社交需求
+- 重置不区分私聊/群聊，只要发消息的人被判定为管理员
+
 ## 0.6.2
 
 - 社交指数改为**支持小数**：`social_grow_min` / `social_grow_max` / `social_talk_threshold` /

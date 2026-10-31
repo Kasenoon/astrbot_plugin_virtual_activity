@@ -289,6 +289,21 @@ class VirtualActivityPlugin(Star):
         mark = getattr(part, "mark_as_temp", None)
         return mark() if callable(mark) else part
 
+    # ------------------------------------------------------------ 主人说话 → 社交清零
+
+    @filter.event_message_type(filter.EventMessageType.ALL)
+    async def on_owner_talk(self, event: AstrMessageEvent):
+        """管理员主动找它说话，社交需求就算满足了，社交指数压回基线。"""
+        try:
+            enabled = self._cfg("social_reset_on_owner_message", True)
+            if isinstance(enabled, str):
+                enabled = enabled.strip().lower() in {"1", "true", "yes", "on"}
+            if not enabled or not self._is_admin(event):
+                return
+            self.engine.reset_social(ROBOT_ID)
+        except Exception as exc:  # noqa: BLE001 - 不能影响正常对话
+            self.logger.warning(f"[virtual_activity] 重置社交指数失败: {exc}")
+
     # ------------------------------------------------------------ LLM
 
     async def _generate(self, system_prompt: str, prompt: str) -> str:

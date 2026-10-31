@@ -89,6 +89,8 @@ data/plugin_data/astrbot_plugin_virtual_activity/
 | `social_grow_min` / `social_grow_max` | `1.0` / `2.0` | 社交指数每分钟随机增长区间，**支持小数**（如 `0.3` / `0.8`） |
 | `social_talk_threshold` | `70.0` | 社交超过这个值才可能主动搭话，越接近 100 概率越高，支持小数 |
 | `social_talk_cost` | `45.0` | 主动说完话后社交指数回落多少，支持小数 |
+| `social_reset_on_owner_message` | `true` | 管理员主动找它说话时，把社交指数重置 |
+| `social_reset_value` | `0.0` | 重置到多少（`0` 完全清零，想留一点可设 `30`） |
 | `robot_avatar` | `🐋` | 房间视图里表示机器人位置的图标：表情，或图片 URL / 路径 |
 | `announce_activity` | `false` | 自动活动是否发消息；关掉后只更新状态不发话，手动指令仍会回一句 |
 | `read_chars` | `1500` | 每次读书推进多少字（会在句号/段落处断开） |
@@ -220,7 +222,7 @@ books/<id>.txt      # 正文（导入时统一转 UTF-8）
 | 参数 | 范围 | 变化规则 | 作用 |
 |---|---|---|---|
 | 精力 `energy` | 0–100 | 每分钟 `+energy_recover_per_min`；做活动时按效果的 `energy_delta` 加减 | 低于 50 开始偏向休息类家具，越低越明显；低于 30 时 LLM 提示里也会写「你现在很累」 |
-| 社交 `social_hunger` | 0–100（保留一位小数） | 每分钟在 `social_grow_min~max` 之间随机增长，可配小数 | 超过阈值后，tick 有概率变成「主动找你说话」，概率 = (社交/100)²，说完 `-social_talk_cost` |
+| 社交 `social_hunger` | 0–100（保留一位小数） | 每分钟在 `social_grow_min~max` 之间随机增长，可配小数 | 超过阈值后，tick 有概率变成「主动找你说话」，概率 = (社交/100)²，说完 `-social_talk_cost`；**你主动找它说话时直接重置到 `social_reset_value`** |
 
 效果里的两个字段：
 

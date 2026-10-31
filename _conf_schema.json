@@ -129,6 +129,19 @@
     "slider": { "min": 5, "max": 90, "step": 1 },
     "hint": "主动说完话后社交指数下降多少，支持小数"
   },
+  "social_reset_on_owner_message": {
+    "description": "主人说话就重置社交指数",
+    "type": "bool",
+    "default": true,
+    "hint": "你主动找它说话时，社交需求就算被满足了，指数会压回下面的基线值"
+  },
+  "social_reset_value": {
+    "description": "重置到多少",
+    "type": "float",
+    "default": 0.0,
+    "slider": { "min": 0, "max": 90, "step": 1 },
+    "hint": "重置后的社交指数，0 表示完全清零；想保留一点可以设成 30"
+  },
   "tv_hours_weekday": {
     "description": "电视谷时（工作日）",
     "type": "string",

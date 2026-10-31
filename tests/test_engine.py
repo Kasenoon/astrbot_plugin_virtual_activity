@@ -448,6 +448,26 @@ class EngineTestCase(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result.ok, result.message)
         self.assertAlmostEqual(float(result.state["social_hunger"]), 69.5, places=1)
 
+    async def test_owner_talk_resets_social(self):
+        state = self.store.load_state("default")
+        state["social_hunger"] = 88.0
+        self.store._atomic_write(self.store.state_path("default"), state)
+
+        engine = self.make_engine()
+        value = engine.reset_social("default")
+        self.assertAlmostEqual(value, 0.0, places=1)
+        self.assertAlmostEqual(float(self.store.load_state("default")["social_hunger"]), 0.0, places=1)
+
+    async def test_owner_talk_reset_value_configurable(self):
+        self.cfg["social_reset_value"] = 25.0
+        state = self.store.load_state("default")
+        state["social_hunger"] = 88.0
+        self.store._atomic_write(self.store.state_path("default"), state)
+
+        engine = self.make_engine()
+        engine.reset_social("default")
+        self.assertAlmostEqual(float(self.store.load_state("default")["social_hunger"]), 25.0, places=1)
+
     async def test_high_social_triggers_talking(self):
         state = self.store.load_state("default")
         state["social_hunger"] = 100.0

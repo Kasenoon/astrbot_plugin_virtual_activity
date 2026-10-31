@@ -93,7 +93,7 @@ async def main() -> int:
 
     # 指令 handler 是否被框架收集
     names = {md.handler_name for md in star_handlers_registry}
-    for handler_name in ("cmd_home", "cmd_point", "cmd_test_point", "cmd_test_tick", "cmd_list", "cmd_room", "cmd_weather", "cmd_help", "cmd_book_lookup", "book_lookup", "inject_state"):
+    for handler_name in ("cmd_home", "cmd_point", "cmd_test_point", "cmd_test_tick", "cmd_list", "cmd_room", "cmd_weather", "cmd_help", "cmd_book_lookup", "book_lookup", "on_owner_talk", "inject_state"):
         check(handler_name in names, f"注册 handler {handler_name}")
 
     status = plugin.engine.status("default")
@@ -169,6 +169,19 @@ async def main() -> int:
             self.system_prompt = "你是小鲸鱼。"
             self.prompt = "你在干嘛？"
             self.extra_user_content_parts: list = []
+
+    # ---- 主人说话 → 社交指数重置 ----
+    state = plugin.store.load_state("default")
+    state["social_hunger"] = 90.0
+    plugin.store.save_state(state)
+    await plugin.on_owner_talk(FakeEvent())
+    check(float(plugin.store.load_state("default")["social_hunger"]) == 0.0, "管理员说话后社交指数重置")
+
+    state = plugin.store.load_state("default")
+    state["social_hunger"] = 90.0
+    plugin.store.save_state(state)
+    await plugin.on_owner_talk(FakeEvent(sender="10086"))
+    check(float(plugin.store.load_state("default")["social_hunger"]) == 90.0, "非管理员说话不重置")
 
     def state_parts(request):
         return [

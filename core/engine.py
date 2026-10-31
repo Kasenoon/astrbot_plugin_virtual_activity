@@ -199,6 +199,17 @@ class VirtualRoomEngine:
     def load_state(self, robot_id: str = "default") -> dict[str, Any]:
         return self._refresh(self.store.load_state(robot_id), self.now())
 
+    def reset_social(self, robot_id: str = "default", value: float | None = None) -> float:
+        """主人主动找它说话后，社交需求被满足：直接把社交指数压回基线值。"""
+        now = self.now()
+        state = self._refresh(self.store.load_state(robot_id), now)
+        self._apply_body_state(state, now, effect=None)
+        target = self._float_cfg("social_reset_value", 0.0) if value is None else float(value)
+        state["social_hunger"] = round(_clamp(target, 0.0, 100.0), 1)
+        state["social_reset_at"] = store_module.isoformat(now)
+        self.store.save_state(state)
+        return float(state["social_hunger"])
+
     def is_busy(self, state: dict[str, Any]) -> bool:
         ends_at = store_module.parse_iso(state.get("ends_at"))
         return bool(state.get("behavior")) and ends_at is not None and ends_at > self.now()
